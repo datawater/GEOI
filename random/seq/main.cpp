@@ -123,7 +123,7 @@ int main() {
             l = nss[ion - 1] + 1;
 
         if (ion != nss.size() - 1)
-            r = nss[ion + 1 ] + 1;
+            r = nss[ion + 1] + 1;
 
         
         cout << l << " " << r << endl;

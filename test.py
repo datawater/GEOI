@@ -4,8 +4,8 @@ import sys
 import os, os.path as path
 import re
 import threading
-import resource
 import subprocess
+import difflib
 from datetime import timedelta
 from pathlib import Path
 from typing import *
@@ -86,9 +86,12 @@ def run_tests(executable: str, tests: list[Tuple[str, str]], memory_limit: int, 
             return
 
         if outs.decode() != output_exp:
-            if "Memory limit exceeded":
+            if "Memory limit exceeded" in outs.decode():
+                print(outs.decode())
                 memory_limit_exceeded.append(test[0])
             else:
+                print(f"Expected: {output_exp.strip()}. Got: {list(outs)}")
+
                 fails.append(test[0])
             return
                     
@@ -97,7 +100,7 @@ def run_tests(executable: str, tests: list[Tuple[str, str]], memory_limit: int, 
     for test in tests:
         thread = threading.Thread(target=run_test, args=(test, memory_limit, time_limit, malloc_override))
         threads.append(thread)
- 
+
     [t.start() for t in threads]
     [t.join() for t in threads]
 
@@ -155,7 +158,7 @@ def main():
 
     tests_in_sol: list[str] = os.listdir(tests_directory) 
     tests_in:  list[str] = list(filter(lambda p: path.splitext(p)[1] == '.in',  tests_in_sol))
-    tests_sol: list[str] = list(filter(lambda p: path.splitext(p)[1] == '.sol', tests_in_sol))
+    tests_sol: list[str] = list(filter(lambda p: path.splitext(p)[1] == '.sol' or path.splitext(p)[1] == '.out', tests_in_sol))
     tests: list[Tuple[str, str]] = list(zip(tests_in, tests_sol))
 
     del tests_in_sol, tests_in, tests_sol
