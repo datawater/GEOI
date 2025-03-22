@@ -2,3 +2,4 @@
 .ccls-cache
 .mypy_cache
 *.so
+.env.secret

@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#!/usr/bin/env python
 
 import sys
 import os, os.path as path
@@ -87,11 +87,8 @@ def run_tests(executable: str, tests: list[Tuple[str, str]], memory_limit: int, 
 
         if outs.decode() != output_exp:
             if "Memory limit exceeded" in outs.decode():
-                print(outs.decode())
                 memory_limit_exceeded.append(test[0])
             else:
-                print(f"Expected: {output_exp.strip()}. Got: {list(outs)}")
-
                 fails.append(test[0])
             return
                     
