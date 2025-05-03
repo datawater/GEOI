@@ -1,4 +1,4 @@
-#pragma GCC optimize("Ofast")
+#pragma GCC optimize("O3")
 #pragma GCC arch("native")
 
 #pragma GCC diagnostic warning "-Wall"
@@ -30,14 +30,14 @@ const u64 INF = 1e9;
 const u64 MOD = 1e9 + 7;
 
 template <typename T>
-T debugln(string str, T&& expr) {
+T debugln(string_view str, T&& expr) {
     cerr << str << " = " << expr << endl;
     
     return expr;
 }
 
 template <typename T>
-vector<T> debugln(string str, vector<T>&& expr) {
+vector<T> debugln(string_view str, vector<T>&& expr) {
     cerr << str << " = ";
     for_range(int, i, 0, expr.size()) cerr << expr[i] << " ";
     cerr << "\n";
@@ -90,37 +90,65 @@ inline T rcin() {
     return t;
 }
 
+u64 solve(int* array, int array_size, int limit) {
+    u64 sum = 0;
+    int stack[array_size]; // Simulating recursion with an explicit stack
+    int sp = 0; // Stack pointer
+    int i = 0;  // Index iterator
+    int m = 1;  // Value iterator
+
+    while (true) {
+        while (i < array_size && array[i] != 0) {
+            i++;
+        }
+
+        if (i >= array_size) {
+            sum = (sum + 1) % MOD;
+            if (sp == 0) break;
+            i = stack[--sp];
+            m = array[i] + 1;
+            array[i] = 0;
+            continue;
+        }
+
+        while (m <= limit) {
+            if ((i > 0 && array[i - 1] != 0 && abs(array[i - 1] - m) >= 2) ||
+                (i < array_size - 1 && array[i + 1] != 0 && abs(array[i + 1] - m) >= 2)) {
+                m++;
+                continue;
+            }
+
+            array[i] = m;
+            stack[sp++] = i;
+            i++;
+            m = 1;
+            break;
+        }
+
+        if (m > limit) {
+            if (sp == 0) break;
+            i = stack[--sp];
+            m = array[i] + 1;
+            array[i] = 0;
+        }
+    }
+
+    return sum;
+}
+
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0); cout.tie(0);
 
-    auto noc = rcin<int>();
-    auto n = rcin<int>();
+    auto array_size  = rcin<int>();
+    auto upper_bound = rcin<int>();
 
-    auto cs = amalloc(int, noc);
-    for_range(int, i, 0, noc) {
-        cs[i] = rcin<int>();
+    auto array = amalloc(int, array_size);
+
+    for_range(int, i, 0, array_size) {
+        auto el = rcin<int>();
+        array[i] = el;
     }
 
-    auto memo = amalloc(int, n + 1);
-
-    memo[0] = 1;
-
-    for_range(int, i, 1, n + 1) {
-        memo[i] = 0;
-
-        for_range(int, j, 0, noc) {
-            auto c = cs[j];
-            auto s = i - c;
-
-            if (s < 0)
-                continue;
-
-            memo[i] = (memo[i] + memo[s]) % MOD;
-        }
-    }
-
-    cout << memo[n] << "\n";
-
-    return 0;
+    cout << solve(array, array_size, upper_bound) << "\n";
 }

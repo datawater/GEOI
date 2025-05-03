@@ -94,33 +94,54 @@ int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0); cout.tie(0);
 
-    auto noc = rcin<int>();
-    auto n = rcin<int>();
+    int height = rcin<int>(), width = rcin<int>();
 
-    auto cs = amalloc(int, noc);
-    for_range(int, i, 0, noc) {
-        cs[i] = rcin<int>();
-    }
+    char inputs[height * width] = {0};
+    bool visitd[height * width] = {false};
+    
+    int A = -1, B = -1;
+    for_range(int, i, 0, height * width) {
+        inputs[i] = rcin<char>();
+        if (inputs[i] == 'A') A = i;
+        if (inputs[i] == 'B') B = i;
+    };
 
-    auto memo = amalloc(int, n + 1);
+    int directions[] = {1, -1, width, -width};
+    array<function<bool(int)>, 4> masks = 
+        {[=](int x) {return x % width < (width  - 1);}, [=](int x) {return x % width > 0;},
+         [=](int x) {return x / width < (height - 1);}, [=](int x) {return x / width > 0;}};
 
-    memo[0] = 1;
+    queue<int> q;
+    q.push(A);
+    visitd[A] = true;
 
-    for_range(int, i, 1, n + 1) {
-        memo[i] = 0;
+    vector<int> res;
 
-        for_range(int, j, 0, noc) {
-            auto c = cs[j];
-            auto s = i - c;
+    while (!q.empty()) {
+        int current = q.front();
+        q.pop();
 
-            if (s < 0)
+        res.push_back(current);
+
+        for_range(int, j, 0, 4) {
+            int dir = directions[j];
+            int mvt = current + dir;
+
+            if (!masks[j](current) || inputs[mvt] == '#' || visitd[mvt])
                 continue;
 
-            memo[i] = (memo[i] + memo[s]) % MOD;
+            if (mvt == B) {
+                res.push_back(current);
+                break;
+            }
+
+            visitd[mvt] = true;
+            q.push(mvt);
         }
     }
 
-    cout << memo[n] << "\n";
+    for_range(size_t, i, 0, res.size()) cout << res[i];
+    cout << "\n";
 
     return 0;
 }

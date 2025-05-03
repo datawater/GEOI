@@ -90,37 +90,65 @@ inline T rcin() {
     return t;
 }
 
+typedef struct cut_s {
+    char D;
+    u64 r;
+    char P;
+} cut;
+
+inline u64 area(u64 x1, u64 y1, u64 x2, u64 y2) {
+    return (u64)(abs<i64>((i64)x1 - (i64)x2) * abs<i64>((i64)y1 - (i64)y2));
+}
+
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0); cout.tie(0);
 
-    auto noc = rcin<int>();
-    auto n = rcin<int>();
+    u64 x1 = rcin<u64>(); u64 y1 = rcin<u64>(); u64 x2 = rcin<u64>(); u64 y2 = rcin<u64>();
 
-    auto cs = amalloc(int, noc);
-    for_range(int, i, 0, noc) {
-        cs[i] = rcin<int>();
+    if (x1 > x2) {
+        auto t1 = x1;
+        auto t2 = y1;
+        x1 = x2; y1 = y2;
+        x2 = t1; y2 = t2;
     }
 
-    auto memo = amalloc(int, n + 1);
+    int N = rcin<int>();
 
-    memo[0] = 1;
+    auto cuts = amalloc(cut, N);
 
-    for_range(int, i, 1, n + 1) {
-        memo[i] = 0;
+    for_range(int, i, 0, N) {
+        char D = rcin<char>();
+        u64  r = rcin<u64>();
+        char P = rcin<char>();
+        
+        cuts[i] = (cut) {D, r, P};
+    }
 
-        for_range(int, j, 0, noc) {
-            auto c = cs[j];
-            auto s = i - c;
+    u64 S = area(x1, y1, x2, y2);
 
-            if (s < 0)
-                continue;
+    // abcisa - X
+    // ordinata - Y
 
-            memo[i] = (memo[i] + memo[s]) % MOD;
+    for_range(int, i, 0, N) {
+        auto c = cuts[i];
+
+        if (c.D == 'V') {
+            if (c.P == 'L')
+                x1 = c.r;
+            else
+                x2 = c.r;
         }
+ 
+        if (c.D == 'H') {
+            if (c.P == 'B')
+                y1 = c.r;
+            else
+                y2 = c.r;
+        }
+
+        S = area(x1, y1, x2, y2);
     }
 
-    cout << memo[n] << "\n";
-
-    return 0;
+    cout << S << "\n";
 }

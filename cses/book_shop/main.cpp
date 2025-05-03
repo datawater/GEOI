@@ -30,14 +30,14 @@ const u64 INF = 1e9;
 const u64 MOD = 1e9 + 7;
 
 template <typename T>
-T debugln(string str, T&& expr) {
+T debugln(string_view str, T&& expr) {
     cerr << str << " = " << expr << endl;
     
     return expr;
 }
 
 template <typename T>
-vector<T> debugln(string str, vector<T>&& expr) {
+vector<T> debugln(string_view str, vector<T>&& expr) {
     cerr << str << " = ";
     for_range(int, i, 0, expr.size()) cerr << expr[i] << " ";
     cerr << "\n";
@@ -90,37 +90,38 @@ inline T rcin() {
     return t;
 }
 
+
+using book = pair<uint16_t, uint16_t>;
+bool book_cmp(book l, book r) {
+    return l.first < r.first;
+}
+
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0); cout.tie(0);
 
-    auto noc = rcin<int>();
-    auto n = rcin<int>();
+    auto nob = rcin<int>();
+    auto mtp = rcin<int>();
 
-    auto cs = amalloc(int, noc);
-    for_range(int, i, 0, noc) {
-        cs[i] = rcin<int>();
-    }
+    auto bs = amalloc(book, nob);
 
-    auto memo = amalloc(int, n + 1);
+    for_range(int, i, 0, nob) bs[i].first = rcin<uint16_t>();
+    for_range(int, i, 0, nob) bs[i].second = rcin<uint16_t>();
 
-    memo[0] = 1;
+    sort(bs, bs + nob);
 
-    for_range(int, i, 1, n + 1) {
-        memo[i] = 0;
+    auto memo = amalloc(int, mtp + 1);
+    memo[0] = 0;
 
-        for_range(int, j, 0, noc) {
-            auto c = cs[j];
-            auto s = i - c;
-
-            if (s < 0)
+    for_range(int, i, 0, nob) {
+        for (int j = mtp; j > 0; j--) {
+            if (bs[i].first > j)
                 continue;
-
-            memo[i] = (memo[i] + memo[s]) % MOD;
+            
+            memo[j] =
+                max(memo[j], bs[i].second + memo[j - bs[i].first]);
         }
     }
 
-    cout << memo[n] << "\n";
-
-    return 0;
+    cout << memo[mtp] << "\n";
 }

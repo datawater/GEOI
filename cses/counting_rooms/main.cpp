@@ -94,33 +94,50 @@ int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0); cout.tie(0);
 
-    auto noc = rcin<int>();
-    auto n = rcin<int>();
+    int height = rcin<int>(), width = rcin<int>();
+    int number_of_rooms = 0;
 
-    auto cs = amalloc(int, noc);
-    for_range(int, i, 0, noc) {
-        cs[i] = rcin<int>();
-    }
+    char inputs[height * width] = {0};
+    bool visitd[height * width] = {false};
+    for_range(int, i, 0, height * width) inputs[i] = rcin<char>();
 
-    auto memo = amalloc(int, n + 1);
+    queue<int> q;
 
-    memo[0] = 1;
+    int directions[] = {1, -1, width, -width};
+    array<function<bool(int)>, 4> masks = 
+        {[=](int x) {return x % width < (width  - 1);}, [=](int x) {return x % width > 0;},
+         [=](int x) {return x / width < (height - 1);}, [=](int x) {return x / width > 0;}};
 
-    for_range(int, i, 1, n + 1) {
-        memo[i] = 0;
+    for (int i = 0; i < width * height; i++) {
+        if (inputs[i] == '#' || visitd[i])
+            continue;
 
-        for_range(int, j, 0, noc) {
-            auto c = cs[j];
-            auto s = i - c;
+        q.push(i);
+        visitd[i] = true;
 
-            if (s < 0)
-                continue;
+        while (!q.empty()) {
+            int current = q.front();
+            q.pop();
 
-            memo[i] = (memo[i] + memo[s]) % MOD;
+            for (int j = 0; j < 4; j++) {
+                int dir  = directions[j];
+                int new_ = current + dir;
+    
+                if (!masks[j](current))
+                    continue;
+
+                if (inputs[new_] == '#' || visitd[new_])
+                    continue;
+
+                visitd[new_] = true;
+                q.push(new_);
+            }
         }
+
+        number_of_rooms++;
     }
 
-    cout << memo[n] << "\n";
 
+    cout << number_of_rooms << "\n";
     return 0;
 }

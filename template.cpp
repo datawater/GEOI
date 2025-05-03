@@ -30,14 +30,14 @@ const u64 INF = 1e9;
 const u64 MOD = 1e9 + 7;
 
 template <typename T>
-T debugln(string_view str, T&& expr) {
+T debugln(string str, T&& expr) {
     cerr << str << " = " << expr << endl;
     
     return expr;
 }
 
 template <typename T>
-vector<T> debugln(string_view str, vector<T>&& expr) {
+vector<T> debugln(string str, vector<T>&& expr) {
     cerr << str << " = ";
     for_range(int, i, 0, expr.size()) cerr << expr[i] << " ";
     cerr << "\n";
